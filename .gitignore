@@ -3,3 +3,4 @@ dist/
 .idea/
 .rider/
 .env
+.next/dev/cache/
