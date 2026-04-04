@@ -242,7 +242,7 @@ export function useStocks() {
     return result
   }, [])
 
-  const update = useCallback(async (id: string, data: { name?: string; shares?: number }) => {
+  const update = useCallback(async (id: string, data: { name?: string; ticker?: string; shares?: number }) => {
     const result = await stocksApi.update(id, data)
     setData(prev => prev.map(s => s.id === id ? result : s))
     return result

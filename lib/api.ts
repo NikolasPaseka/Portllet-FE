@@ -287,7 +287,7 @@ export const stocksApi = {
       createdAt: string
       updatedAt: string
     }>("/stocks", { method: "POST", body: JSON.stringify(data) }),
-  update: (id: string, data: { name?: string; shares?: number }) =>
+  update: (id: string, data: { name?: string; ticker?: string; shares?: number }) =>
     apiRequest<{
       id: string
       name: string
@@ -367,43 +367,4 @@ export const assetsApi = {
       createdAt: string
     }>(`/assets/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   delete: (id: string) => apiRequest(`/assets/${id}`, { method: "DELETE" }),
-}
-
-// Documents API
-export const documentsApi = {
-  list: (type?: string) => {
-    const url = type ? `/documents?type=${type}` : "/documents"
-    return apiRequest<Array<{
-      id: string
-      type: string
-      name: string
-      description: string
-      fileUrl: string
-      fileType: string
-      fileSize: number
-      createdAt: string
-      tags: string[]
-    }>>(url)
-  },
-  getUploadUrl: (fileName: string, contentType: string) =>
-    apiRequest<{ uploadUrl: string; fileUrl: string }>("/documents/upload-url", {
-      method: "POST",
-      body: JSON.stringify({ fileName, contentType }),
-    }),
-  create: (data: {
-    type: string
-    name: string
-    description: string
-    fileUrl: string
-    fileType: string
-    fileSize: number
-    tags?: string[]
-  }) => apiRequest("/documents", { method: "POST", body: JSON.stringify(data) }),
-  update: (id: string, data: { name?: string; description?: string; type?: string }) =>
-    apiRequest(`/documents/${id}`, { method: "PUT", body: JSON.stringify(data) }),
-  delete: (id: string) => apiRequest(`/documents/${id}`, { method: "DELETE" }),
-  addTag: (id: string, tagName: string) =>
-    apiRequest(`/documents/${id}/tags`, { method: "POST", body: JSON.stringify({ tagName }) }),
-  removeTag: (id: string, tagName: string) =>
-    apiRequest(`/documents/${id}/tags/${tagName}`, { method: "DELETE" }),
 }

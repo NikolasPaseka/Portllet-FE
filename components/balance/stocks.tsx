@@ -65,6 +65,7 @@ export function Stocks({ entries, onCreate, onUpdate, onDelete, loading }: Stock
       if (editingId) {
         await onUpdate(editingId, {
           name,
+          ticker: ticker.toUpperCase(),
           shares: parseFloat(shares),
         })
       } else {

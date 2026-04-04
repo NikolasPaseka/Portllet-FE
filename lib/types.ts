@@ -51,14 +51,4 @@ export interface OtherAsset {
   note: string
 }
 
-export interface DocumentEntry {
-  id: string
-  name: string
-  description: string
-  dateAdded: string
-  fileType: string
-  fileSize: string
-  tags: string[]
-}
-
-export type Section = "balance" | "contracts" | "receipts" | "diplomas"
+export type Section = "balance" | "settings"

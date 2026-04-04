@@ -43,8 +43,6 @@ __turbopack_context__.s([
     ()=>cryptoApi,
     "dashboardApi",
     ()=>dashboardApi,
-    "documentsApi",
-    ()=>documentsApi,
     "stocksApi",
     ()=>stocksApi
 ]);
@@ -235,39 +233,6 @@ const assetsApi = {
             body: JSON.stringify(data)
         }),
     delete: (id)=>apiRequest(`/assets/${id}`, {
-            method: "DELETE"
-        })
-};
-const documentsApi = {
-    list: (type)=>{
-        const url = type ? `/documents?type=${type}` : "/documents";
-        return apiRequest(url);
-    },
-    getUploadUrl: (fileName, contentType)=>apiRequest("/documents/upload-url", {
-            method: "POST",
-            body: JSON.stringify({
-                fileName,
-                contentType
-            })
-        }),
-    create: (data)=>apiRequest("/documents", {
-            method: "POST",
-            body: JSON.stringify(data)
-        }),
-    update: (id, data)=>apiRequest(`/documents/${id}`, {
-            method: "PUT",
-            body: JSON.stringify(data)
-        }),
-    delete: (id)=>apiRequest(`/documents/${id}`, {
-            method: "DELETE"
-        }),
-    addTag: (id, tagName)=>apiRequest(`/documents/${id}/tags`, {
-            method: "POST",
-            body: JSON.stringify({
-                tagName
-            })
-        }),
-    removeTag: (id, tagName)=>apiRequest(`/documents/${id}/tags/${tagName}`, {
             method: "DELETE"
         })
 };

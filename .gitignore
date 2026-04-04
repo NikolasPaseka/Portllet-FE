@@ -4,3 +4,4 @@ dist/
 .rider/
 .env
 .next/dev/cache/
+.next/

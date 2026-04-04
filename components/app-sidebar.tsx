@@ -2,11 +2,9 @@
 
 import {
   Wallet,
-  FileText,
-  Receipt,
-  GraduationCap,
   LayoutDashboard,
   LogOut,
+  Settings,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -22,9 +20,7 @@ import { Button } from "@/components/ui/button"
 
 const navItems: { id: Section; label: string; icon: React.ElementType; color: string }[] = [
   { id: "balance", label: "Cash Balance", icon: Wallet, color: "text-emerald-400" },
-  { id: "contracts", label: "Contracts", icon: FileText, color: "text-sky-400" },
-  { id: "receipts", label: "Receipts", icon: Receipt, color: "text-amber-400" },
-  { id: "diplomas", label: "Diplomas", icon: GraduationCap, color: "text-rose-400" },
+  { id: "settings", label: "Settings", icon: Settings, color: "text-blue-400" },
 ]
 
 interface AppSidebarProps {
