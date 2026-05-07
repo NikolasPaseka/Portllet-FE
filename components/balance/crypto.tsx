@@ -18,8 +18,8 @@ import { useFxRate } from "@/hooks/use-fx-rate"
 
 interface CryptoProps {
   entries: CryptoEntry[]
-  onCreate: (entry: { name: string; symbol: string; amount: number }) => Promise<unknown>
-  onUpdate: (id: string, data: { name?: string; amount?: number }) => Promise<unknown>
+  onCreate: (entry: { name: string; symbol: string; amount: number; source?: string }) => Promise<unknown>
+  onUpdate: (id: string, data: { name?: string; amount?: number; source?: string }) => Promise<unknown>
   onDelete: (id: string) => Promise<void>
   loading?: boolean
 }
@@ -32,6 +32,7 @@ export function Crypto({ entries, onCreate, onUpdate, onDelete, loading }: Crypt
   const [name, setName] = useState("")
   const [symbol, setSymbol] = useState("")
   const [amount, setAmount] = useState("")
+  const [source, setSource] = useState("")
 
   const total = entries.reduce(
     (sum, e) => sum + toCZK(e.totalValueUsd ?? 0, "USD"),
@@ -42,6 +43,7 @@ export function Crypto({ entries, onCreate, onUpdate, onDelete, loading }: Crypt
     setName("")
     setSymbol("")
     setAmount("")
+    setSource("")
     setEditingId(null)
   }
 
@@ -55,6 +57,7 @@ export function Crypto({ entries, onCreate, onUpdate, onDelete, loading }: Crypt
     setName(entry.name)
     setSymbol(entry.symbol)
     setAmount(entry.amount.toString())
+    setSource(entry.source ?? "")
     setOpen(true)
   }
 
@@ -66,12 +69,14 @@ export function Crypto({ entries, onCreate, onUpdate, onDelete, loading }: Crypt
         await onUpdate(editingId, {
           name,
           amount: parseFloat(amount),
+          source: source || undefined,
         })
       } else {
         await onCreate({
           name,
           symbol: symbol.toUpperCase(),
           amount: parseFloat(amount),
+          source: source || undefined,
         })
       }
     } finally {
@@ -123,6 +128,7 @@ export function Crypto({ entries, onCreate, onUpdate, onDelete, loading }: Crypt
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {entry.amount} units @ ${entry.livePriceUsd?.toLocaleString("en-US") ?? "N/A"} USD
+                    {entry.source && ` • ${entry.source}`}
                   </p>
                   <p className="text-sm font-mono font-semibold text-foreground mt-0.5">
                     {formatCZK(toCZK(entry.totalValueUsd ?? 0, "USD"))}
@@ -184,6 +190,15 @@ export function Crypto({ entries, onCreate, onUpdate, onDelete, loading }: Crypt
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
                 placeholder="0"
+                className="bg-secondary border-border text-foreground"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm text-muted-foreground">Source (optional)</Label>
+              <Input
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                placeholder="e.g. Exodus, Metamask..."
                 className="bg-secondary border-border text-foreground"
               />
             </div>

@@ -51,6 +51,12 @@
       "regex": "^/register(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/register(?:/)?$"
+    },
+    {
+      "page": "/settings",
+      "regex": "^/settings(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/settings(?:/)?$"
     }
   ],
   "dataRoutes": [],

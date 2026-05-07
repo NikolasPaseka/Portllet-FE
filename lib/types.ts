@@ -30,6 +30,7 @@ export interface StockEntry {
   name: string
   ticker: string
   shares: number
+  source?: string
   livePriceUsd: number | null
   totalValueUsd: number | null
 }
@@ -39,6 +40,7 @@ export interface CryptoEntry {
   name: string
   symbol: string
   amount: number
+  source?: string
   livePriceUsd: number | null
   totalValueUsd: number | null
 }
@@ -48,7 +50,57 @@ export interface OtherAsset {
   name: string
   value: number
   currency: Currency
-  note: string
+  note?: string
+  source?: string
 }
 
-export type Section = "balance" | "settings"
+export type Section = "balance" | "settings" | "calendar" | "todo"
+
+export interface CalendarEvent {
+  id: string
+  title: string
+  description?: string
+  start: string
+  end: string
+  colorId?: string
+  attendees?: { email: string; displayName?: string }[]
+  isAllDay: boolean
+  calendarId?: string
+  calendarName?: string
+  calendarColor?: string
+}
+
+export interface GoogleAccountStatus {
+  connected: boolean
+  email?: string
+}
+
+export type RepeatType = "none" | "daily" | "weekly" | "monthly"
+
+export interface TodoSubtask {
+  id: string
+  title: string
+  completed: boolean
+  position: number
+}
+
+export interface TodoTask {
+  id: string
+  title: string
+  description?: string
+  dueDate?: string
+  duration?: number
+  repeat: RepeatType
+  completed: boolean
+  position: number
+  subtasks: TodoSubtask[]
+  sectionId?: string
+}
+
+export interface TodoSection {
+  id: string
+  name: string
+  color: string
+  position: number
+  tasks: TodoTask[]
+}

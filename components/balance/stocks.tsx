@@ -18,8 +18,8 @@ import { useFxRate } from "@/hooks/use-fx-rate"
 
 interface StocksProps {
   entries: StockEntry[]
-  onCreate: (entry: { name: string; ticker: string; shares: number }) => Promise<unknown>
-  onUpdate: (id: string, data: { name?: string; shares?: number }) => Promise<unknown>
+  onCreate: (entry: { name: string; ticker: string; shares: number; source?: string }) => Promise<unknown>
+  onUpdate: (id: string, data: { name?: string; shares?: number; source?: string }) => Promise<unknown>
   onDelete: (id: string) => Promise<void>
   loading?: boolean
 }
@@ -32,6 +32,7 @@ export function Stocks({ entries, onCreate, onUpdate, onDelete, loading }: Stock
   const [name, setName] = useState("")
   const [ticker, setTicker] = useState("")
   const [shares, setShares] = useState("")
+  const [source, setSource] = useState("")
 
   const total = entries.reduce(
     (sum, e) => sum + toCZK(e.totalValueUsd ?? 0, "USD"),
@@ -42,6 +43,7 @@ export function Stocks({ entries, onCreate, onUpdate, onDelete, loading }: Stock
     setName("")
     setTicker("")
     setShares("")
+    setSource("")
     setEditingId(null)
   }
 
@@ -55,6 +57,7 @@ export function Stocks({ entries, onCreate, onUpdate, onDelete, loading }: Stock
     setName(entry.name)
     setTicker(entry.ticker)
     setShares(entry.shares.toString())
+    setSource(entry.source ?? "")
     setOpen(true)
   }
 
@@ -67,12 +70,14 @@ export function Stocks({ entries, onCreate, onUpdate, onDelete, loading }: Stock
           name,
           ticker: ticker.toUpperCase(),
           shares: parseFloat(shares),
+          source: source || undefined,
         })
       } else {
         await onCreate({
           name,
           ticker: ticker.toUpperCase(),
           shares: parseFloat(shares),
+          source: source || undefined,
         })
       }
     } finally {
@@ -124,6 +129,7 @@ export function Stocks({ entries, onCreate, onUpdate, onDelete, loading }: Stock
                   </div>
                   <p className="text-xs text-muted-foreground mt-0.5">
                     {entry.shares} shares @ ${entry.livePriceUsd?.toLocaleString("en-US") ?? "N/A"} USD
+                    {entry.source && ` • ${entry.source}`}
                   </p>
                   <p className="text-sm font-mono font-semibold text-foreground mt-0.5">
                     {formatCZK(toCZK(entry.totalValueUsd ?? 0, "USD"))}
@@ -184,6 +190,15 @@ export function Stocks({ entries, onCreate, onUpdate, onDelete, loading }: Stock
                 value={shares}
                 onChange={(e) => setShares(e.target.value)}
                 placeholder="0"
+                className="bg-secondary border-border text-foreground"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm text-muted-foreground">Source (optional)</Label>
+              <Input
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                placeholder="e.g. Fidelity, Robinhood..."
                 className="bg-secondary border-border text-foreground"
               />
             </div>

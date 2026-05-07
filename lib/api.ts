@@ -271,28 +271,31 @@ export const stocksApi = {
     name: string
     ticker: string
     shares: number
+    source?: string
     livePriceUsd: number | null
     totalValueUsd: number | null
     createdAt: string
     updatedAt: string
   }>>("/stocks"),
-  create: (data: { name: string; ticker: string; shares: number }) =>
+  create: (data: { name: string; ticker: string; shares: number; source?: string }) =>
     apiRequest<{
       id: string
       name: string
       ticker: string
       shares: number
+      source?: string
       livePriceUsd: number | null
       totalValueUsd: number | null
       createdAt: string
       updatedAt: string
     }>("/stocks", { method: "POST", body: JSON.stringify(data) }),
-  update: (id: string, data: { name?: string; ticker?: string; shares?: number }) =>
+  update: (id: string, data: { name?: string; ticker?: string; shares?: number; source?: string }) =>
     apiRequest<{
       id: string
       name: string
       ticker: string
       shares: number
+      source?: string
       livePriceUsd: number | null
       totalValueUsd: number | null
       createdAt: string
@@ -308,28 +311,31 @@ export const cryptoApi = {
     name: string
     symbol: string
     amount: number
+    source?: string
     livePriceUsd: number | null
     totalValueUsd: number | null
     createdAt: string
     updatedAt: string
   }>>("/crypto"),
-  create: (data: { name: string; symbol: string; amount: number }) =>
+  create: (data: { name: string; symbol: string; amount: number; source?: string }) =>
     apiRequest<{
       id: string
       name: string
       symbol: string
       amount: number
+      source?: string
       livePriceUsd: number | null
       totalValueUsd: number | null
       createdAt: string
       updatedAt: string
     }>("/crypto", { method: "POST", body: JSON.stringify(data) }),
-  update: (id: string, data: { name?: string; amount?: number }) =>
+  update: (id: string, data: { name?: string; amount?: number; source?: string }) =>
     apiRequest<{
       id: string
       name: string
       symbol: string
       amount: number
+      source?: string
       livePriceUsd: number | null
       totalValueUsd: number | null
       createdAt: string
@@ -345,26 +351,216 @@ export const assetsApi = {
     name: string
     value: number
     currency: string
-    note: string
+    note?: string
+    source?: string
     createdAt: string
   }>>("/assets"),
-  create: (data: { name: string; value: number; currency: string; note: string }) =>
+  create: (data: { name: string; value: number; currency: string; note?: string; source?: string }) =>
     apiRequest<{
       id: string
       name: string
       value: number
       currency: string
-      note: string
+      note?: string
+      source?: string
       createdAt: string
     }>("/assets", { method: "POST", body: JSON.stringify(data) }),
-  update: (id: string, data: { name?: string; value?: number; note?: string }) =>
+  update: (id: string, data: { name?: string; value?: number; note?: string; source?: string }) =>
     apiRequest<{
       id: string
       name: string
       value: number
       currency: string
-      note: string
+      note?: string
+      source?: string
       createdAt: string
     }>(`/assets/${id}`, { method: "PUT", body: JSON.stringify(data) }),
   delete: (id: string) => apiRequest(`/assets/${id}`, { method: "DELETE" }),
+}
+
+// Calendar API
+export const calendarApi = {
+  getStatus: () =>
+    apiRequest<{ connected: boolean; email?: string }>("/auth/google/status"),
+
+  connect: () =>
+    apiRequest<{ url: string }>("/auth/google"),
+
+  disconnect: () =>
+    apiRequest<{ message: string }>("/auth/google", { method: "DELETE" }),
+
+  getCalendars: () =>
+    apiRequest<Array<{ id: string; name: string; color: string }>>("/calendar/calendars"),
+
+  getEvents: (timeMin?: string, timeMax?: string) => {
+    const params = new URLSearchParams()
+    if (timeMin) params.set("timeMin", timeMin)
+    if (timeMax) params.set("timeMax", timeMax)
+    const url = params.toString() ? `/calendar/events?${params}` : "/calendar/events"
+    return apiRequest<Array<{
+      id: string
+      title: string
+      description?: string
+      start: string
+      end: string
+      colorId?: string
+      attendees?: { email: string; displayName?: string }[]
+      isAllDay: boolean
+      calendarId?: string
+      calendarName?: string
+      calendarColor?: string
+    }>>(url)
+  },
+
+  createEvent: (data: {
+    summary: string
+    description?: string
+    start: string
+    end: string
+    calendarId: string
+    isAllDay: boolean
+  }) =>
+    apiRequest<{
+      id: string
+      title: string
+      description?: string
+      start: string
+      end: string
+      isAllDay: boolean
+    }>("/calendar/events", { method: "POST", body: JSON.stringify(data) }),
+
+  updateEvent: (data: {
+    eventId: string
+    summary?: string
+    description?: string
+    start?: string
+    end?: string
+    calendarId: string
+    isAllDay: boolean
+  }) =>
+    apiRequest<{
+      id: string
+      title: string
+      description?: string
+      start: string
+      end: string
+      isAllDay: boolean
+    }>("/calendar/events", { method: "PUT", body: JSON.stringify(data) }),
+
+  deleteEvent: (eventId: string, calendarId: string) =>
+    apiRequest<{ message: string }>("/calendar/events", {
+      method: "DELETE",
+      body: JSON.stringify({ eventId, calendarId }),
+    }),
+}
+
+// Todo API
+export const todoApi = {
+  getSections: () =>
+    apiRequest<Array<{
+      id: string
+      name: string
+      color: string
+      position: number
+      tasks: Array<{
+        id: string
+        sectionId: string
+        title: string
+        description?: string
+        dueDate?: string
+        duration?: number
+        repeat: string
+        completed: boolean
+        position: number
+        subtasks: Array<{ id: string; title: string; completed: boolean; position: number }>
+      }>
+    }>>("/todos/sections"),
+
+  createSection: (name: string, color?: string) =>
+    apiRequest<{
+      id: string
+      name: string
+      color: string
+      position: number
+      tasks: unknown[]
+    }>("/todos/sections", {
+      method: "POST",
+      body: JSON.stringify({ name, color }),
+    }),
+
+  updateSection: (id: string, data: { name?: string; color?: string; position?: number }) =>
+    apiRequest<{
+      id: string
+      name: string
+      color: string
+      position: number
+    }>("/todos/sections", {
+      method: "PUT",
+      body: JSON.stringify({ id, ...data }),
+    }),
+
+  deleteSection: (id: string) =>
+    apiRequest<{ message: string }>(`/todos/sections/${id}`, { method: "DELETE" }),
+
+  createTask: (data: {
+    sectionId: string
+    title: string
+    description?: string
+    dueDate?: string
+    duration?: number
+    repeat?: string
+    subtasks?: { title: string }[]
+  }) =>
+    apiRequest<{
+      id: string
+      sectionId: string
+      title: string
+      description?: string
+      dueDate?: string
+      duration?: number
+      repeat: string
+      completed: boolean
+      position: number
+      subtasks: Array<{ id: string; title: string; completed: boolean; position: number }>
+    }>("/todos/tasks", { method: "POST", body: JSON.stringify(data) }),
+
+  updateTask: (data: {
+    id: string
+    title?: string
+    description?: string
+    dueDate?: string | null
+    duration?: number | null
+    repeat?: string
+    completed?: boolean
+    sectionId?: string
+    position?: number
+    subtasks?: Array<{ id?: string; title: string; completed?: boolean }>
+  }) =>
+    apiRequest<{
+      id: string
+      sectionId: string
+      title: string
+      description?: string
+      dueDate?: string
+      duration?: number
+      repeat: string
+      completed: boolean
+      position: number
+      subtasks: Array<{ id: string; title: string; completed: boolean; position: number }>
+    }>("/todos/tasks", { method: "PUT", body: JSON.stringify(data) }),
+
+  deleteTask: (id: string) =>
+    apiRequest<{ message: string }>(`/todos/tasks/${id}`, { method: "DELETE" }),
+
+  reorderSections: (sectionIds: string[]) =>
+    apiRequest<{ message: string }>("/todos/sections/reorder", {
+      method: "PUT",
+      body: JSON.stringify({ sectionIds }),
+    }),
+
+  reorderTasks: (taskUpdates: { taskId: string; sectionId: string; position: number }[]) =>
+    apiRequest<{ message: string }>("/todos/tasks/reorder", {
+      method: "PUT",
+      body: JSON.stringify({ taskUpdates }),
+    }),
 }

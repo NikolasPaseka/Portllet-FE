@@ -13,7 +13,6 @@ import { BankAccounts } from "./bank-accounts"
 import { Stocks } from "./stocks"
 import { Crypto } from "./crypto"
 import { OtherAssets } from "./other-assets"
-import { useFxRate } from "@/hooks/use-fx-rate"
 
 const FALLBACK_RATE = 23.5
 
@@ -24,9 +23,22 @@ export function BalanceOverview() {
   const { data: stocksData = [], loading: stockLoading, create: createStock, update: updateStock, remove: deleteStock } = useStocks()
   const { data: cryptoData = [], loading: cryptoLoading, create: createCrypto, update: updateCrypto, remove: deleteCrypto } = useCrypto()
   const { data: assetsData = [], loading: assetLoading, create: createAsset, update: updateAsset, remove: deleteAsset } = useAssets()
-  const { rate, loading: fxLoading, toCZK, formatCZK } = useFxRate()
 
-  const effectiveRate = dashboard?.fx_rate_usd_czk || rate || FALLBACK_RATE
+  const rate = dashboard?.fx_rate_usd_czk || FALLBACK_RATE
+
+  const toCZK = (amount: number, currency: "CZK" | "USD") => {
+    if (currency === "CZK") return amount
+    return amount * rate
+  }
+
+  const formatCZK = (amount: number) => {
+    return new Intl.NumberFormat("cs-CZ", {
+      style: "currency",
+      currency: "CZK",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
 
   // Wrap create functions to refetch dashboard after operations
   const handleCreateAsset = async (entry: any) => {
@@ -143,7 +155,7 @@ export function BalanceOverview() {
     },
   ]
 
-  const loading = dashboardLoading || fxLoading
+  const loading = dashboardLoading
 
   return (
     <div className="flex flex-col gap-5">
@@ -155,11 +167,11 @@ export function BalanceOverview() {
             <p className="text-3xl font-bold text-foreground font-mono">
               {loading ? "..." : formatCZK(grandTotal)}
             </p>
-            {!loading && (
-              <p className="text-xs text-muted-foreground mt-1.5">
-                1 USD = {effectiveRate.toFixed(2)} CZK
-              </p>
-            )}
+              {loading === false && (
+                <p className="text-xs text-muted-foreground mt-1.5">
+                  1 USD = {rate.toFixed(2)} CZK
+                </p>
+              )}
           </div>
         </div>
       </div>
@@ -221,6 +233,7 @@ export function BalanceOverview() {
             value: a.value,
             currency: a.currency as "CZK" | "USD",
             note: a.note,
+            source: a.source,
           }))}
           onCreate={handleCreateAsset}
           onUpdate={handleUpdateAsset}

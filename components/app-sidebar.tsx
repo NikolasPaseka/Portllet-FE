@@ -5,6 +5,8 @@ import {
   LayoutDashboard,
   LogOut,
   Settings,
+  CalendarDays,
+  ListTodo,
 } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
@@ -20,6 +22,8 @@ import { Button } from "@/components/ui/button"
 
 const navItems: { id: Section; label: string; icon: React.ElementType; color: string }[] = [
   { id: "balance", label: "Cash Balance", icon: Wallet, color: "text-emerald-400" },
+  { id: "calendar", label: "Calendar", icon: CalendarDays, color: "text-orange-400" },
+  { id: "todo", label: "Todo", icon: ListTodo, color: "text-purple-400" },
   { id: "settings", label: "Settings", icon: Settings, color: "text-blue-400" },
 ]
 

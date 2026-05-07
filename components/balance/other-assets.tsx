@@ -19,8 +19,8 @@ import { useFxRate } from "@/hooks/use-fx-rate"
 
 interface OtherAssetsProps {
   entries: OtherAsset[]
-  onCreate: (entry: { name: string; value: number; currency: string; note: string }) => Promise<unknown>
-  onUpdate: (id: string, data: { name?: string; value?: number; note?: string }) => Promise<unknown>
+  onCreate: (entry: { name: string; value: number; currency: string; note?: string; source?: string }) => Promise<unknown>
+  onUpdate: (id: string, data: { name?: string; value?: number; note?: string; source?: string }) => Promise<unknown>
   onDelete: (id: string) => Promise<void>
   loading?: boolean
 }
@@ -34,6 +34,7 @@ export function OtherAssets({ entries, onCreate, onUpdate, onDelete, loading }: 
   const [value, setValue] = useState("")
   const [currency, setCurrency] = useState<Currency>("CZK")
   const [note, setNote] = useState("")
+  const [source, setSource] = useState("")
 
   const total = entries.reduce((sum, e) => sum + toCZK(e.value, e.currency), 0)
 
@@ -41,6 +42,7 @@ export function OtherAssets({ entries, onCreate, onUpdate, onDelete, loading }: 
     setName("")
     setValue("")
     setNote("")
+    setSource("")
     setCurrency("CZK")
     setEditingId(null)
   }
@@ -55,7 +57,8 @@ export function OtherAssets({ entries, onCreate, onUpdate, onDelete, loading }: 
     setName(entry.name)
     setValue(entry.value.toString())
     setCurrency(entry.currency)
-    setNote(entry.note)
+    setNote(entry.note ?? "")
+    setSource(entry.source ?? "")
     setOpen(true)
   }
 
@@ -67,14 +70,16 @@ export function OtherAssets({ entries, onCreate, onUpdate, onDelete, loading }: 
         await onUpdate(editingId, {
           name,
           value: parseFloat(value),
-          note,
+          note: note || undefined,
+          source: source || undefined,
         })
       } else {
         await onCreate({
           name,
           value: parseFloat(value),
           currency,
-          note,
+          note: note || undefined,
+          source: source || undefined,
         })
       }
     } finally {
@@ -117,9 +122,12 @@ export function OtherAssets({ entries, onCreate, onUpdate, onDelete, loading }: 
               >
                 <div>
                   <p className="text-sm font-medium text-foreground">{entry.name}</p>
-                  {entry.note && (
-                    <p className="text-xs text-muted-foreground">{entry.note}</p>
-                  )}
+                  <p className="text-xs text-muted-foreground">
+                    {entry.note}
+                    {entry.note && entry.source && " • "}
+                    {entry.source}
+                    {!entry.note && entry.source}
+                  </p>
                   <p className="text-sm font-mono font-semibold text-foreground mt-0.5">
                     {formatCZK(toCZK(entry.value, entry.currency))}
                   </p>
@@ -177,6 +185,15 @@ export function OtherAssets({ entries, onCreate, onUpdate, onDelete, loading }: 
                 value={note}
                 onChange={(e) => setNote(e.target.value)}
                 placeholder="Description..."
+                className="bg-secondary border-border text-foreground"
+              />
+            </div>
+            <div className="flex flex-col gap-1.5">
+              <Label className="text-sm text-muted-foreground">Source (optional)</Label>
+              <Input
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                placeholder="e.g. Owned, Leased..."
                 className="bg-secondary border-border text-foreground"
               />
             </div>

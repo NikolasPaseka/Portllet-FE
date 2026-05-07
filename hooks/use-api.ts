@@ -38,6 +38,7 @@ interface StockEntry {
   name: string
   ticker: string
   shares: number
+  source?: string
   livePriceUsd: number | null
   totalValueUsd: number | null
   createdAt: string
@@ -49,6 +50,7 @@ interface CryptoEntry {
   name: string
   symbol: string
   amount: number
+  source?: string
   livePriceUsd: number | null
   totalValueUsd: number | null
   createdAt: string
@@ -60,7 +62,8 @@ interface OtherAsset {
   name: string
   value: number
   currency: string
-  note: string
+  note?: string
+  source?: string
   createdAt: string
 }
 
@@ -236,13 +239,13 @@ export function useStocks() {
     refetch()
   }, [refetch])
 
-  const create = useCallback(async (entry: { name: string; ticker: string; shares: number }) => {
+  const create = useCallback(async (entry: { name: string; ticker: string; shares: number; source?: string }) => {
     const result = await stocksApi.create(entry)
     setData(prev => [...prev, result])
     return result
   }, [])
 
-  const update = useCallback(async (id: string, data: { name?: string; ticker?: string; shares?: number }) => {
+  const update = useCallback(async (id: string, data: { name?: string; ticker?: string; shares?: number; source?: string }) => {
     const result = await stocksApi.update(id, data)
     setData(prev => prev.map(s => s.id === id ? result : s))
     return result
@@ -279,13 +282,13 @@ export function useCrypto() {
     refetch()
   }, [refetch])
 
-  const create = useCallback(async (entry: { name: string; symbol: string; amount: number }) => {
+  const create = useCallback(async (entry: { name: string; symbol: string; amount: number; source?: string }) => {
     const result = await cryptoApi.create(entry)
     setData(prev => [...prev, result])
     return result
   }, [])
 
-  const update = useCallback(async (id: string, data: { name?: string; amount?: number }) => {
+  const update = useCallback(async (id: string, data: { name?: string; amount?: number; source?: string }) => {
     const result = await cryptoApi.update(id, data)
     setData(prev => prev.map(c => c.id === id ? result : c))
     return result
@@ -322,13 +325,13 @@ export function useAssets() {
     refetch()
   }, [refetch])
 
-  const create = useCallback(async (entry: { name: string; value: number; currency: string; note: string }) => {
+  const create = useCallback(async (entry: { name: string; value: number; currency: string; note?: string; source?: string }) => {
     const result = await assetsApi.create(entry)
     setData(prev => [...prev, result])
     return result
   }, [])
 
-  const update = useCallback(async (id: string, data: { name?: string; value?: number; note?: string }) => {
+  const update = useCallback(async (id: string, data: { name?: string; value?: number; note?: string; source?: string }) => {
     const result = await assetsApi.update(id, data)
     setData(prev => prev.map(a => a.id === id ? result : a))
     return result
